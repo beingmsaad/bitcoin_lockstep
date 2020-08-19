@@ -39,7 +39,7 @@ var counter = 0;
     }
     if(counter == 5){
     //possible HashSplit Attack. Remove connection 
-    fs.appendFileSync(path+timestamp+'ban.txt', 'bitcoin-cli addnode '+ip+ ' \"remove\" \n');
+    fs.appendFileSync(path+timestamp+'ban.txt', 'bitcoin-cli addnode '+ip+ ' \"add\" \n');
     fs.appendFileSync(path+timestamp+'ban.txt', 'bitcoin-cli addnode '+ip+ ' \"remove\" \n');
     //remove the last six IP addresses commands from mining nodes
     shell.exec('ed -s '+path+timestamp+'.txt'+' <<< $\'-6,$d\\nwq')
