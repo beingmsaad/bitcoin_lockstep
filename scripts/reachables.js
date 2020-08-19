@@ -1,3 +1,4 @@
+//Connecting through peers.dat parsing can be time consuming. We have mapped our results with Bitnodes and received almost same number of reachable nodes by parsing peers.dat. For user simplicity, we will provide Bitnodes parser to allow this node to connect with all the reachable nodes
 const request = require('request');
 const BitcoinRpc = require('bitcoin-rpc-promise');
 var sleep = require('sleep')
@@ -17,7 +18,7 @@ request('https://bitnodes.io/api/v1/snapshots/latest', function (error, response
   }
 
 //Making Connections to All Reachable Nodes. 
-shell.exec('parallel -j 100 < '+path+timestamp+'.txt')
+shell.exec('parallel -j 200 < '+path+timestamp+'.txt')
 console.log('Connections Made')
 });
 
