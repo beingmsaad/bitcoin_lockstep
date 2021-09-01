@@ -6,7 +6,7 @@ template to create the initial release notes draft.*
 for the process.*
 
 *Create the draft, named* "*version* Release Notes Draft"
-*(e.g. "0.20.0 Release Notes Draft"), as a collaborative wiki in:*
+*(e.g. "22.0 Release Notes Draft"), as a collaborative wiki in:*
 
 https://github.com/bitcoin-core/bitcoin-devwiki/wiki/
 
@@ -34,37 +34,51 @@ How to Upgrade
 ==============
 
 If you are running an older version, shut it down. Wait until it has completely
-shut down (which might take a few minutes for older versions), then run the
+shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/Bitcoin-Qt` (on Mac)
 or `bitcoind`/`bitcoin-qt` (on Linux).
 
 Upgrading directly from a version of Bitcoin Core that has reached its EOL is
-possible, but it might take some time if the datadir needs to be migrated. Old
+possible, but it might take some time if the data directory needs to be migrated. Old
 wallet versions of Bitcoin Core are generally supported.
 
 Compatibility
 ==============
 
-Bitcoin Core is supported and extensively tested on operating systems using
-the Linux kernel, macOS 10.10+, and Windows 7 and newer. It is not recommended
-to use Bitcoin Core on unsupported systems.
-
-Bitcoin Core should also work on most other Unix-like systems but is not
-as frequently tested on them.
-
-From Bitcoin Core 0.17.0 onwards, macOS versions earlier than 10.10 are no
-longer supported, as Bitcoin Core is now built using Qt 5.9.x which requires
-macOS 10.10+. Additionally, Bitcoin Core does not yet change appearance when
-macOS "dark mode" is activated.
-
-In addition to previously supported CPU platforms, this release's pre-compiled
-distribution provides binaries for the RISC-V platform.
+Bitcoin Core is supported and extensively tested on operating systems
+using the Linux kernel, macOS 10.14+, and Windows 7 and newer.  Bitcoin
+Core should also work on most other Unix-like systems but is not as
+frequently tested on them.  It is not recommended to use Bitcoin Core on
+unsupported systems.
 
 Notable changes
 ===============
 
+P2P and network changes
+-----------------------
+
+- A bitcoind node will no longer rumour addresses to inbound peers by default.
+  They will become eligible for address gossip after sending an ADDR, ADDRV2,
+  or GETADDR message. (#21528)
+
+Updated RPCs
+------------
+
 New RPCs
 --------
+
+Build System
+------------
+
+Files
+-----
+
+* On startup, the list of banned hosts and networks (via `setban` RPC) in
+  `banlist.dat` is ignored and only `banlist.json` is considered. Bitcoin Core
+  version 22.x is the only version that can read `banlist.dat` and also write
+  it to `banlist.json`. If `banlist.json` already exists, version 22.x will not
+  try to translate the `banlist.dat` into json. After an upgrade, `listbanned`
+  can be used to double check the parsed entries. (#22570)
 
 New settings
 ------------
@@ -72,29 +86,33 @@ New settings
 Updated settings
 ----------------
 
-Updated RPCs
-------------
+Tools and Utilities
+-------------------
 
-Note: some low-level RPC changes mainly useful for testing are described in the
-Low-level Changes section below.
-
-GUI changes
------------
+- Update `-getinfo` to return data in a user-friendly format that also reduces vertical space. (#21832)
 
 Wallet
 ------
 
-- The wallet now by default uses bech32 addresses when using RPC, and creates native segwit change outputs.
+GUI changes
+-----------
 
 Low-level changes
 =================
 
+RPC
+---
+
+- `getblockchaininfo` now returns a new `time` field, that provides the chain tip time. (#22407)
+
 Tests
 -----
 
-- `-fallbackfee` was 0 (disabled) by default for the main chain, but 0.0002 by default for the test chains. Now it is 0
-  by default for all chains. Testnet and regtest users will have to add `fallbackfee=0.0002` to their configuration if
-  they weren't setting it and they want it to keep working like before. (#16524)
+- For the `regtest` network the activation heights of several softforks were
+  changed.
+  * BIP 34 (blockheight in coinbase) from 500 to 2 (#16333)
+  * BIP 66 (DERSIG) from 1251 to 102 (#22632)
+  * BIP 65 (CLTV) from 1351 to 111 (#21862)
 
 Credits
 =======

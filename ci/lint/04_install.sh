@@ -1,27 +1,22 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2018 The Bitcoin Core developers
+# Copyright (c) 2018-2020 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 export LC_ALL=C
 
-if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-  # update first to install required ruby dependency
-  travis_retry brew update
-  travis_retry brew reinstall git -- --with-pcre2 # for  --perl-regexp
-  travis_retry brew install grep # gnu grep for --perl-regexp support
-  PATH="$(brew --prefix grep)/libexec/gnubin:$PATH"
-  travis_retry brew install shellcheck
-  travis_retry brew upgrade python
-  PATH="$(brew --prefix python)/bin:$PATH"
-  export PATH
-else
-  SHELLCHECK_VERSION=v0.6.0
-  travis_retry curl --silent "https://storage.googleapis.com/shellcheck/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar --xz -xf - --directory /tmp/
-  PATH="/tmp/shellcheck-${SHELLCHECK_VERSION}:${PATH}"
-  export PATH
-fi
+${CI_RETRY_EXE} apt-get update
+${CI_RETRY_EXE} apt-get install -y clang-format-9 python3-pip curl git gawk jq
+update-alternatives --install /usr/bin/clang-format      clang-format      $(which clang-format-9     ) 100
+update-alternatives --install /usr/bin/clang-format-diff clang-format-diff $(which clang-format-diff-9) 100
 
-travis_retry pip3 install codespell==1.15.0
-travis_retry pip3 install flake8==3.7.8
+${CI_RETRY_EXE} pip3 install codespell==2.0.0
+${CI_RETRY_EXE} pip3 install flake8==3.8.3
+${CI_RETRY_EXE} pip3 install yq
+${CI_RETRY_EXE} pip3 install mypy==0.781
+${CI_RETRY_EXE} pip3 install vulture==2.3
+
+SHELLCHECK_VERSION=v0.7.2
+curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar --xz -xf - --directory /tmp/
+export PATH="/tmp/shellcheck-${SHELLCHECK_VERSION}:${PATH}"
